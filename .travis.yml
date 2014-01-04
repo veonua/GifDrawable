@@ -8,14 +8,22 @@ notifications:
   email: false
 
 before_install:
-  - wget http://dl.google.com/android/android-sdk_r21.0.1-linux.tgz
-  - tar -zxf android-sdk_r21.0.1-linux.tgz
+# newest android SDK 22.0.5
+  - wget http://dl.google.com/android/android-sdk_r22.0.5-linux.tgz
+  - tar -zxf android-sdk_r22.0.5-linux.tgz
   - export ANDROID_HOME=`pwd`/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
-  - TOOLS=$(android list sdk --no-ui | grep "Android SDK Platform-tools" | cut -d"-" -f1)
-  - android update sdk --filter "$TOOLS" --no-ui --force
-  - SDK=$(android list sdk --no-ui | grep ", API 19," | cut -d"-" -f1)
-  - android update sdk --filter "$SDK" --no-ui --force
+  # manually set sdk.dir variable, according to local paths
+  - echo "sdk.dir=$ANDROID_HOME" > local.properties
+  - echo yes | android update sdk -t tools,platform-tools,extra-android-support,extra-android-m2repository,android-18 --force --no-ui
+  # build tools cannot be installed through "android update sdk" as of now
+  - wget http://dl.google.com/android/repository/build-tools_r18.0.1-linux.zip
+  - mkdir -p $ANDROID_HOME/build-tools
+  - unzip -qq build-tools_r18.0.1-linux.zip -d $ANDROID_HOME/build-tools/
+  - mv $ANDROID_HOME/build-tools/android-4.3 $ANDROID_HOME/build-tools/18.0.1
+  # verify files exist in right paths
+  - find $ANDROID_HOME/build-tools
+  - file $ANDROID_HOME/build-tools/18.0.1/aapt
 
 script:
   - ant debug
