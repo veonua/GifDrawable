@@ -8,7 +8,11 @@ notifications:
   email: false
 
 before_install:
-# newest android SDK 22.0.5
+  # required libs for android build tools
+  - if [ `uname -m` = x86_64 ]; then sudo apt-get update; fi
+  - if [ `uname -m` = x86_64 ]; then sudo apt-get install -qq --force-yes libgd2-xpm ia32-libs ia32-libs-multiarch; fi
+
+  # newest android SDK 22.0.5
   - wget http://dl.google.com/android/android-sdk_r22.0.5-linux.tgz
   - tar -zxf android-sdk_r22.0.5-linux.tgz
   - export ANDROID_HOME=`pwd`/android-sdk-linux
@@ -23,7 +27,7 @@ before_install:
   - mv $ANDROID_HOME/build-tools/android-4.3 $ANDROID_HOME/build-tools/18.0.1
   # verify files exist in right paths
   - find $ANDROID_HOME/build-tools
-  - file $ANDROID_HOME/build-tools/18.0.1/aapt
+  # - file $ANDROID_HOME/build-tools/18.0.1/aapt
 
 script:
   - ant debug
